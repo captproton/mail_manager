@@ -1,0 +1,49 @@
+<%= title "Listing Mailings" %>
+
+<% if @mailings.length > 0 %>
+	<table class="list" border="0" cellpadding="0" cellspacing="0">
+	  <tr class="title">
+      <td>Subject</td>
+      <td>Mailable Name</td>
+      <td>Scheduled At</td>
+      <td>Status</td>
+      <td colspan="2"> </td>
+    </tr>
+		<% @mailings.each do |mailing| %>
+		<tr class="<%= cycle('odd','even') %>">
+			<td><%=h mailing.subject %></td>
+			<td><%=h mailing.mailable.name rescue 'N/A' %></td>
+			<td><%=l(mailing.scheduled_at) rescue '' %></td>
+			<td><b><%=h mailing.status %></b></td>
+			<td align="center"><nobr><%= link_to 'Send Test', mail_manager.test_mailing_path(mailing), :id => 'Send_Test', :class => 'button' %></nobr></td>
+      <td><div class="mailing_buttons">
+      <% if mailing.can_edit? %>
+			<%= link_to 'Edit', mail_manager.edit_mailing_path(mailing), :class => 'button' %>
+			<% if mailing.can_schedule? %>
+			<%= link_to 'Schedule', mail_manager.schedule_mailing_path(mailing), :method => :put, :class => 'button', :id => "schedule_mailing_#{mailing.id}", :confirm => "Are you sure you want to start the mailing at #{l(mailing.scheduled_at) rescue "N/A"}?" %>
+			<% end %>
+      <% end %>
+			<% if mailing.can_cancel? %>
+			<%= link_to 'Cancel', mail_manager.cancel_mailing_path(mailing), :method => :put, :class => 'button', :id => "cancel_mailing_#{mailing.id}" %>
+      <% end %>
+      <% if mailing.messages.size > 0 %>
+			<%= link_to 'Messages', mail_manager.mailing_messages_path(mailing), :class => 'button' %>
+      <% end %>
+      <% if mailing.bounces.size > 0 %>
+			<%= link_to 'Bounces', mail_manager.bounces_path(:mailing_id => mailing.id), :class => 'button' %>
+      <% end %>
+			<%= link_to 'Delete', mail_manager.mailing_path(mailing), :method => :delete, :confirm => "Are you sure?", :class => 'button' %>
+      </div></td>
+		</tr>
+		<% end %>
+	</table>
+<% else %>
+No mailings exist.<br /><br />
+<% end %>
+
+<%= content_for :page_navigation do %>
+<div>
+  <%= will_paginate @mailings %><br /><br />
+  <%= link_to "New Mailing", mail_manager.new_mailing_path, :class => 'button' %>
+</div>
+<% end %>

@@ -1,0 +1,8 @@
+<p>
+  <b>Status:</b>
+  <%=h @subscription.status %>
+</p>
+
+
+<%= link_to 'Edit', mail_manager.edit_subscription_path(@subscription) %> |
+<%= link_to 'Back', mail_manager.subscriptions_path %>

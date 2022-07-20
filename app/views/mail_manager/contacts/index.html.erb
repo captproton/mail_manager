@@ -1,0 +1,72 @@
+<%= title "Listing Contacts" %>
+
+<%= form_tag mail_manager.contacts_path(), :id => 'search_form', :method => 'get' do %>
+  <label class="form" for="term">Contact Search:</label> <%= text_field_tag "term","", title: "First or last name or email" ,  :class => "text", :style => "width: 400px;" %><br />
+  <label class="form" for="mailing_list_id">Mailing List:</label><%= select_tag "mailing_list_id", options_for_select([['','']] + @mailing_lists, params[:mailing_list_id].to_i), {onChange: "return toggleStatus()"} %><br />
+  <div id="subscription_status_selector" style="display: <%= params[:mailing_list_id].present? ? 'inline' : 'none' %>">
+    <label class="form" for="status">Status:</label><%= select_tag "status", options_for_select(@statuses, params[:status]) %>
+  </div>    
+  <%= submit_tag "Search", :class => 'button' %>
+<% end %>
+<% content_for :head do %>
+<script language="javascript">
+function toggleStatus() {
+  if(jQuery('#mailing_list_id').val() != '') {
+    jQuery('#subscription_status_selector').show();
+  } else {
+    jQuery('#subscription_status_selector').hide();
+  }
+}
+</script>
+<% end %>
+
+<br/>
+    
+<% if @contacts.length <= 0 %>
+   <p>No contacts exist.</p>
+<% else %>
+<table class="list" cellpadding="1" cellspacing="0">
+  <tr class="title">
+    <td>First Name</td>
+    <td>Last Name</td>
+    <td>Email Address</td>
+  <% if params[:mailing_list_id].present? %>  <td>Status</td> <% end %>
+  <% colspan = 2 
+     colspan += 1 if use_show_for_resources? %>
+    <td colspan="<%= colspan %>"> </td>
+  </tr>
+  <% for contact in @contacts %>
+    <tr class="<%= cycle('odd','even') %>">
+      <td><%=h contact.first_name %></td>
+      <td><%=h contact.last_name %></td>
+      <td><%=h contact.email_address %></td>
+      <% if params[:mailing_list_id].present? %>  <td><%= params[:status].humanize %></td> <% end %>
+    <% if use_show_for_resources? %>
+      <td><%= link_to "View", contact, :class => 'button' %></td>
+    <% end %>
+    <% if (contactable = contact.contactable).present? %>
+      <% if contactable.respond_to?(:is_deleted?) && contactable.is_deleted? %>
+      <td colspan="2"><%= contactable.class.name.humanize %> is Deleted</td>
+    <% else %>
+      <td colspan="2"><%= link_to( "Edit #{contact.contactable.class.name.humanize}", main_app.send(MailManager.edit_route_for(contactable),contactable)
+        ) rescue "No #{contact.contactable.class.name.humanize} Actions" 
+      %>
+        </td>
+      <% end %>
+    <% else %>
+      <td><%= link_to "Edit", mail_manager.edit_contact_path(contact), :class => 'button' %></td>
+      <td><%= link_to "Delete", contact, :confirm => 'Are you sure?', :method => :delete, :class => 'button' %>
+      </td>
+    <% end %>
+    </tr>
+  <% end %>
+</table>
+<% end %>
+
+<%= content_for :page_navigation do %>
+<div>
+  <%= will_paginate @contacts %><br/>
+  <%= link_to "New Contact", mail_manager.new_contact_path, :class => 'button' %>
+</div>
+<% end %>
+

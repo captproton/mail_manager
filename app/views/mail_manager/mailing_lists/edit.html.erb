@@ -1,0 +1,13 @@
+<%= title "Editing #{@mailing_list.name}" %>
+<%= render :partial => 'form' %>
+
+<% @page_title = "Editing #{@mailing_list.name}" %>
+
+<%= content_for :page_navigation do %>
+  <div>
+  <% if use_show_for_resources? %>
+    <%= link_to "Show", @mailing, :class => 'button' %>
+  <% end %>
+    <%= link_to "Back", mail_manager.mailing_lists_path, :class => 'button' %>
+  </div>
+<% end %>

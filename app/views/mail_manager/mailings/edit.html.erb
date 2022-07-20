@@ -1,0 +1,12 @@
+<%= title 'mail_manager/mailing.edit.title', subject: @mailing.subject, default: "Edit #{@mailing.subject}" %>
+
+<%= render :partial => 'form' %>
+
+<%= content_for :page_navigation do %>
+  <div>
+  <% if use_show_for_resources? %>
+    <%= link_to "Show", @mailing, :class => 'button' %>
+  <% end %>
+    <%= link_to "Back", mail_manager.mailings_path, :class => 'button' %>
+  </div>
+<% end %>

@@ -1,0 +1,3 @@
+module MailManager
+end
+
